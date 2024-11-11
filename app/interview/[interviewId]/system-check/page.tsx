@@ -75,7 +75,6 @@ export default function SystemCheck({
         videoRef.current.srcObject = mediaStream;
       }
 
-      // Simulate device checks
       setCheckProgress(33);
       setTimeout(() => {
         setCameraStatus("success");

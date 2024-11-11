@@ -21,10 +21,10 @@ import {
   Bot,
   Pause,
   Play,
+  Loader2,
 } from "lucide-react";
 import AudioVisualization from "./AudioVisualization";
 import { AudioRecorder } from "@/lib/audioRecorder";
-import { fetchInterviewFromS3 } from "@/lib/uploadFileToS3";
 
 interface Message {
   id: number;
@@ -63,6 +63,9 @@ export default function InterviewMeet({
     null
   );
   const [isRecording, setIsRecording] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(10);
+  const [timerStarted, setTimerStarted] = useState(false);
 
   useEffect(() => {
     const recorder = new AudioRecorder({
@@ -77,17 +80,44 @@ export default function InterviewMeet({
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsedTime((prev) => prev + 1);
-    }, 1000);
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+    const fetchData = async () => {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setIsLoading(false);
+        setTimerStarted(true);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIsLoading(false);
       }
-      clearInterval(timer);
     };
-  }, [stream]);
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (timerStarted && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(prevTime => prevTime - 1);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [timerStarted, timeLeft]);
+
+  useEffect(() => {
+    if (!isLoading && timeLeft === 0) {
+      const timer = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+
+      return () => {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        clearInterval(timer);
+      };
+    }
+  }, [stream, isLoading, timeLeft]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -140,7 +170,6 @@ export default function InterviewMeet({
       }
       initializeAudioAnalysis(mediaStream);
 
-      // Mute the audio track by default
       mediaStream.getAudioTracks().forEach((track) => {
         track.enabled = false;
       });
@@ -204,7 +233,7 @@ export default function InterviewMeet({
           timestamp: new Date(),
         },
       ]);
-      setNewMessage("");
+      setNewMessage("")
     }
   };
 
@@ -232,7 +261,6 @@ export default function InterviewMeet({
     }
   };
 
-  // New function to fetch transcription
   const fetchTranscription = async (audioUrl: string) => {
     try {
       const response = await fetch("/api/user-response", {
@@ -248,10 +276,10 @@ export default function InterviewMeet({
       }
 
       const data = await response.json();
-      return data.transcription; // Return the transcription text
+      return data.transcription; 
     } catch (error) {
       console.error("Error fetching transcription:", error);
-      return null; // Handle error appropriately
+      return null; 
     }
   };
 
@@ -520,6 +548,23 @@ export default function InterviewMeet({
           </div>
         )}
       </div>
+      {(isLoading || timeLeft > 0) && (
+        <div className="absolute top-20 left-0 right-0 z-50 flex justify-center">
+          <div className="bg-slate-900/90 backdrop-blur-sm px-6 py-3 rounded-xl border border-slate-700 shadow-lg">
+            {isLoading ? (
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
+                <p className="text-lg font-semibold text-white">Preparing Interview...</p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-lg font-semibold text-white">Interview starts in</p>
+                <div className="text-4xl font-bold text-indigo-500">{timeLeft}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

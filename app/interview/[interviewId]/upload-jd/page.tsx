@@ -15,9 +15,9 @@ import { Label } from "@/components/ui/label";
 import { Upload, FileText, Bot, ArrowRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { User } from "@clerk/nextjs/server";
 import { useUser } from "@clerk/nextjs";
 import { uploadFileToS3 } from "@/lib/uploadFileToS3";
+import { startInterviewWithIntro } from "@/app/api/create-interview/route";
 
 interface InterviewData {
   jobDescription: string;
@@ -43,6 +43,8 @@ export default function InterviewSetup({
   if (!user) {
     router.push("/dashboard");
   }
+
+  console.log(isFileUploaded);
 
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
@@ -85,6 +87,14 @@ export default function InterviewSetup({
       console.log("interview", result.interview);
       console.log("interviewUrl", result.interviewUrl);
       console.log("interviewOutline", result.interviewOutline);
+
+      if (!result.interview) {
+        throw new Error("Interview content is missing in the response.");
+      }
+
+      const startInterview = await startInterviewWithIntro(result.interview);
+
+      console.log("Generated interview introduction:", startInterview);
 
       return result;
     } catch (error) {

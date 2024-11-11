@@ -25,9 +25,7 @@ export class AudioRecorder {
     });
   }
 
-  stopRecording() {
-    // Logic to stop the recording
-  }
+  stopRecording() {}
 
   async startRecording(stream: MediaStream): Promise<void> {
     try {

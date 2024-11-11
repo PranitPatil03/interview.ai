@@ -1,24 +1,63 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Upload, FileText, Bot, ArrowRight } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Upload, FileText, Bot, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { uploadFileToS3 } from "@/lib/uploadFileToS3";
 
-export default function InterviewSetup({ params }: { params: { interviewId: string }}) {
-  const router = useRouter()
-  const [jobDescription, setJobDescription] = useState("")
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+export default function InterviewSetup({
+  params,
+}: {
+  params: { interviewId: string };
+}) {
+  const [jobDescription, setJobDescription] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    router.push(`/interview/${params.interviewId}/system-check`)
-  }
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true);
+    setUploadedFileName(file.name);
+
+    try {
+      const fileUrl = await uploadFileToS3(file, params.interviewId);
+
+      setIsFileUploaded(true);
+      console.log("File uploaded to S3:", fileUrl);
+    } catch (error) {
+      console.error("Error uploading or processing file:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const interviewData = {
+      jobDescription,
+      interviewId: params.interviewId,
+    };
+
+    localStorage.setItem(
+      `interview-${params.interviewId}`,
+      JSON.stringify(interviewData)
+    );
+
+    router.push(`/interview/${params.interviewId}/system-check`);
+  };
 
   const sampleJD = `Senior Frontend Developer
 Requirements:
@@ -27,7 +66,7 @@ Requirements:
 - Experience with state management (Redux, Context API)
 - Understanding of modern web technologies and best practices
 - Experience with responsive design and cross-browser compatibility
-- Strong problem-solving skills and attention to detail`
+- Strong problem-solving skills and attention to detail`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
@@ -38,16 +77,21 @@ Requirements:
               <Bot className="w-6 h-6 text-indigo-500" />
             </div>
             <div>
-              <CardTitle className="text-2xl text-white">Interview Setup</CardTitle>
+              <CardTitle className="text-2xl text-white">
+                Interview Setup
+              </CardTitle>
               <CardDescription className="text-slate-400">
-                Provide the job description and your resume to personalize your interview experience
+                Provide the job description and your resume to personalize your
+                interview experience
               </CardDescription>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="jobDescription" className="text-slate-200">Job Description</Label>
+                <Label htmlFor="jobDescription" className="text-slate-200">
+                  Job Description
+                </Label>
                 <Textarea
                   id="jobDescription"
                   placeholder="Enter the job role requirements and qualifications here..."
@@ -74,10 +118,12 @@ Requirements:
                     type="file"
                     className="hidden"
                     id="resume-upload"
-                    accept=".pdf,.doc,.docx"
+                    accept=".pdf,.doc,.docx,.txt"
                     onChange={(e) => {
-                      setIsUploading(true)
-                      setUploadedFileName(e.target.files?.[0]?.name || null)
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleFileUpload(file);
+                      }
                     }}
                   />
                   <Label
@@ -86,7 +132,7 @@ Requirements:
                   >
                     <Upload className="w-8 h-8 text-slate-400" />
                     <span className="text-slate-400">
-                      Click to upload your resume (PDF, DOC, DOCX)
+                      Click to upload your resume (PDF, DOC, DOCX, or TXT)
                     </span>
                   </Label>
                   {isUploading && uploadedFileName && (
@@ -98,10 +144,10 @@ Requirements:
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all duration-200" 
-                disabled={!jobDescription || !isUploading}
+              <Button
+                type="submit"
+                className="w-full gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white transition-all duration-200"
+                disabled={!jobDescription || !isFileUploaded} // Enable button after file upload
               >
                 Continue to System Check <ArrowRight className="w-4 h-4" />
               </Button>
@@ -110,5 +156,5 @@ Requirements:
         </Card>
       </div>
     </div>
-  )
+  );
 }

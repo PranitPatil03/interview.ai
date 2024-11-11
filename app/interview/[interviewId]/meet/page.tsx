@@ -66,6 +66,8 @@ export default function InterviewMeet({
   const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(10);
   const [timerStarted, setTimerStarted] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const recorder = new AudioRecorder({
@@ -82,27 +84,39 @@ export default function InterviewMeet({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const startInterview = localStorage.getItem(
+          `interview-intro-${params.interviewId}`
+        );
+        console.log("data data data", startInterview);
+        if (startInterview) {
+          const parsedData = JSON.parse(startInterview);
+          if (parsedData.success && parsedData.audioUrl) {
+            setAudioUrl(parsedData.audioUrl);
+          }
+        }
         setIsLoading(false);
         setTimerStarted(true);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [params.interviewId]);
 
   useEffect(() => {
     if (timerStarted && timeLeft > 0) {
       const timer = setTimeout(() => {
-        setTimeLeft(prevTime => prevTime - 1);
+        setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
 
       return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && audioRef.current && audioUrl) {
+      audioRef.current.play();
     }
-  }, [timerStarted, timeLeft]);
+  }, [timerStarted, timeLeft, audioUrl]);
 
   useEffect(() => {
     if (!isLoading && timeLeft === 0) {
@@ -233,7 +247,7 @@ export default function InterviewMeet({
           timestamp: new Date(),
         },
       ]);
-      setNewMessage("")
+      setNewMessage("");
     }
   };
 
@@ -276,10 +290,10 @@ export default function InterviewMeet({
       }
 
       const data = await response.json();
-      return data.transcription; 
+      return data.transcription;
     } catch (error) {
       console.error("Error fetching transcription:", error);
-      return null; 
+      return null;
     }
   };
 
@@ -554,17 +568,24 @@ export default function InterviewMeet({
             {isLoading ? (
               <div className="flex items-center gap-3">
                 <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
-                <p className="text-lg font-semibold text-white">Preparing Interview...</p>
+                <p className="text-lg font-semibold text-white">
+                  Preparing Interview...
+                </p>
               </div>
             ) : (
               <div className="text-center">
-                <p className="text-lg font-semibold text-white">Interview starts in</p>
-                <div className="text-4xl font-bold text-indigo-500">{timeLeft}</div>
+                <p className="text-lg font-semibold text-white">
+                  Interview starts in
+                </p>
+                <div className="text-4xl font-bold text-indigo-500">
+                  {timeLeft}
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
+      {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" />}
     </div>
   );
 }

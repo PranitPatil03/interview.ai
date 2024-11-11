@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { uploadFileToS3 } from "@/lib/uploadFileToS3";
-import { startInterviewWithIntro } from "@/app/api/create-interview/route";
+import { startInterviewWithIntro } from "@/lib/services";
 
 interface InterviewData {
   jobDescription: string;
@@ -93,6 +93,10 @@ export default function InterviewSetup({
       }
 
       const startInterview = await startInterviewWithIntro(result.interview);
+      localStorage.setItem(
+        `interview-intro-${params.interviewId}`,
+        JSON.stringify(startInterview)
+      );
 
       console.log("Generated interview introduction:", startInterview);
 

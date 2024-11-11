@@ -35,10 +35,6 @@ const AudioVisualization: React.FC<AudioVisualizationProps> = ({
     };
   }, [isActive, isSpeaking]);
 
-  useEffect(() => {
-    console.log("AudioVisualization - isActive:", isActive, "isSpeaking:", isSpeaking);
-  }, [isActive, isSpeaking]);
-
   return (
     <div className="flex items-center justify-center gap-1" aria-hidden="true">
       {levels.map((level, i) => (

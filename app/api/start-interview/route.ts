@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@deepgram/sdk";
+import { uploadAudioToS3 } from "@/lib/audioUploadToS3";
+import { v4 as uuidv4 } from "uuid";
 
 const DEEPGRAM_API_KEY = process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
 
@@ -21,7 +23,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as RequestBody;
     console.log("given bodi", body, "dfsdfsdfwerwerwer");
-    let { text, options } = body;
+    let { text } = body;
 
     const paragraphs = text.split("\n\n");
     text = paragraphs.slice(0, 2).join("\n\n");
@@ -34,8 +36,8 @@ export async function POST(req: NextRequest) {
     const { result } = await deepgram.speak.request(
       { text },
       {
-        model: options?.model || "aura-asteria-en",
-        voice: options?.voice || "aurora",
+        model: "aura-asteria-en",
+        voice: "aurora",
       }
     );
 
@@ -44,11 +46,19 @@ export async function POST(req: NextRequest) {
     }
 
     const audioBuffer = await result.arrayBuffer();
-    const base64Audio = Buffer.from(audioBuffer).toString("base64");
+    const audioFileName = `audio-${uuidv4()}.mp3`;
+
+    const audioUrl = await uploadAudioToS3(
+      audioBuffer,
+      audioFileName,
+      result.headers.get("content-type") || "audio/mpeg"
+    );
+
+    console.log(audioUrl)
 
     return NextResponse.json({
       success: true,
-      audio: base64Audio,
+      audioUrl,
       mimeType: result.headers.get("content-type"),
     });
   } catch (error) {

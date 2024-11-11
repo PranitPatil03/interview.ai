@@ -4,7 +4,7 @@ export async function startInterviewWithIntro(interviewOutline: string) {
   }
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/start-interview`,
+      `/api/start-interview`,
       {
         method: "POST",
         headers: {

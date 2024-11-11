@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import AudioVisualization from "./AudioVisualization";
 import { AudioRecorder } from "@/lib/audioRecorder";
+import { fetchInterviewFromS3 } from "@/lib/uploadFileToS3";
 
 interface Message {
   id: number;
@@ -224,8 +225,33 @@ export default function InterviewMeet({
       setIsRecording(false);
       const audioUrl = await audioRecorder.stopRecordingAndUpload();
       console.log("Recording uploaded:", audioUrl);
+      const transcription = await fetchTranscription(audioUrl);
+      console.log("Transcription:", transcription);
     } catch (error) {
       console.error("Failed to stop recording:", error);
+    }
+  };
+
+  // New function to fetch transcription
+  const fetchTranscription = async (audioUrl: string) => {
+    try {
+      const response = await fetch("/api/user-response", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ audioUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch transcription");
+      }
+
+      const data = await response.json();
+      return data.transcription; // Return the transcription text
+    } catch (error) {
+      console.error("Error fetching transcription:", error);
+      return null; // Handle error appropriately
     }
   };
 
@@ -273,7 +299,10 @@ export default function InterviewMeet({
               </div>
               <div className="absolute bottom-4 left-4 flex items-center gap-3 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-slate-200 text-sm border border-slate-700">
                 <span>AI Interviewer</span>
-                <AudioVisualization isActive={false} isSpeaking={isAISpeaking} />
+                <AudioVisualization
+                  isActive={false}
+                  isSpeaking={isAISpeaking}
+                />
               </div>
             </div>
           </div>

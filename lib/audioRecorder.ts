@@ -25,12 +25,11 @@ export class AudioRecorder {
     });
   }
 
-  stopRecording() {}
-
   async startRecording(stream: MediaStream): Promise<void> {
     try {
-      this.audioContext = new AudioContext();
-      this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
+      this.audioContext = new AudioContext({ sampleRate: 44100 });
+      this.mediaStreamSource =
+        this.audioContext.createMediaStreamSource(stream);
       this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
 
       this.mediaStreamSource.connect(this.processor);
@@ -41,7 +40,9 @@ export class AudioRecorder {
 
       this.processor.onaudioprocess = (e) => {
         if (this.isRecording && !this.isPaused) {
-          this.recordedChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+          this.recordedChunks.push(
+            new Float32Array(e.inputBuffer.getChannelData(0))
+          );
         }
       };
     } catch (error) {
@@ -62,7 +63,7 @@ export class AudioRecorder {
     }
 
     try {
-      const audioBlob = this.exportWAV(this.recordedChunks);
+      const audioBlob = this.exportWAV(this.recordedChunks, 44100);
       const fileName = `interview-${Date.now()}.wav`;
       return await this.uploadToS3(audioBlob, fileName);
     } catch (error) {
@@ -71,8 +72,11 @@ export class AudioRecorder {
     }
   }
 
-  private exportWAV(recordedChunks: Float32Array[]): Blob {
-    const bufferLength = recordedChunks.reduce((acc, chunk) => acc + chunk.length, 0);
+  private exportWAV(recordedChunks: Float32Array[], sampleRate: number): Blob {
+    const bufferLength = recordedChunks.reduce(
+      (acc, chunk) => acc + chunk.length,
+      0
+    );
     const audioBuffer = new Float32Array(bufferLength);
     let offset = 0;
     for (const chunk of recordedChunks) {
@@ -80,11 +84,14 @@ export class AudioRecorder {
       offset += chunk.length;
     }
 
-    const wavBuffer = this.createWavFile(audioBuffer);
+    const wavBuffer = this.createWavFile(audioBuffer, sampleRate);
     return new Blob([wavBuffer], { type: "audio/wav" });
   }
 
-  private createWavFile(samples: Float32Array): ArrayBuffer {
+  private createWavFile(
+    samples: Float32Array,
+    sampleRate: number
+  ): ArrayBuffer {
     const buffer = new ArrayBuffer(44 + samples.length * 2);
     const view = new DataView(buffer);
 
@@ -94,7 +101,6 @@ export class AudioRecorder {
       }
     };
 
-    const sampleRate = 44100;
     const numChannels = 1;
 
     writeString(view, 0, "RIFF");
@@ -114,7 +120,7 @@ export class AudioRecorder {
     const volume = 1;
     let index = 44;
     for (let i = 0; i < samples.length; i++) {
-      view.setInt16(index, samples[i] * (0x7FFF * volume), true);
+      view.setInt16(index, samples[i] * (0x7fff * volume), true);
       index += 2;
     }
 

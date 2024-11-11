@@ -262,6 +262,35 @@ export default function InterviewMeet({
     }
   };
 
+  const handleMainInterview = async (
+    transcription: string,
+    parsedInterviewData: string
+  ) => {
+    console.log("dasdasd123123", transcription);
+    if (!transcription && !parsedInterviewData) return;
+
+    try {
+      const response = await fetch("/api/ai-response", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ transcription, parsedInterviewData }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch transcription");
+      }
+
+      const data = await response.json();
+      console.log("ai-question",data);
+      setAudioUrl(data.audioUrl)
+      return data;
+    } catch (error) {
+      console.error("Failed to run interview", error);
+    }
+  };
+
   const stopRecordingAndUpload = async () => {
     if (!audioRecorder) return;
     try {
@@ -270,6 +299,18 @@ export default function InterviewMeet({
       console.log("Recording uploaded:", audioUrl);
       const transcription = await fetchTranscription(audioUrl);
       console.log("Transcription:", transcription);
+
+      const interviewData = localStorage.getItem(
+        `interview-data-${params.interviewId}`
+      );
+      if (interviewData) {
+        const parsedInterviewData = JSON.parse(interviewData);
+        const res = await handleMainInterview(
+          transcription,
+          parsedInterviewData.interviewOutline
+        );
+        console.log(res);
+      }
     } catch (error) {
       console.error("Failed to stop recording:", error);
     }

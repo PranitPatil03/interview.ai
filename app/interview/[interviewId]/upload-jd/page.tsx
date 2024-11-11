@@ -84,6 +84,10 @@ export default function InterviewSetup({
       }
 
       const result = await response.json();
+      localStorage.setItem(
+        `interview-data-${params.interviewId}`,
+        JSON.stringify(result)
+      );
       console.log("interview", result.interview);
       console.log("interviewUrl", result.interviewUrl);
       console.log("interviewOutline", result.interviewOutline);

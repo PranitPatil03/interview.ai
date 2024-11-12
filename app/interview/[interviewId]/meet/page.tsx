@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import AudioVisualization from "./AudioVisualization";
 import { AudioRecorder } from "@/lib/audioRecorder";
+import Image from "next/image";
+import Alex from "../../../../public/images/alex ai interviwer.jpeg";
 
 interface Message {
   id: number;
@@ -69,6 +71,7 @@ export default function InterviewMeet({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isAlexThinking, setIsAlexThinking] = useState(false);
+  const [isAlexSpeaking, setIsAlexSpeaking] = useState(false);
 
   useEffect(() => {
     const recorder = new AudioRecorder({
@@ -114,10 +117,12 @@ export default function InterviewMeet({
       }, 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && audioRef.current && audioUrl) {
+      setIsAlexSpeaking(true);
       audioRef.current.play();
     }
 
     if (audioRef.current && audioUrl) {
+      setIsAlexSpeaking(true);
       setIsAlexThinking(false);
     }
   }, [timerStarted, timeLeft, audioUrl]);
@@ -196,6 +201,10 @@ export default function InterviewMeet({
     }
   };
 
+  if (isSpeaking) {
+    setIsAlexSpeaking(false);
+  }
+
   useEffect(() => {
     startStream();
   }, []);
@@ -216,6 +225,7 @@ export default function InterviewMeet({
       setIsMuted((prev) => !prev);
 
       if (isMuted) {
+        setIsAlexSpeaking(false);
         startRecording();
       } else {
         stopRecordingAndUpload();
@@ -345,11 +355,26 @@ export default function InterviewMeet({
   const toggleRecording = () => {
     if (isRecording) {
       stopRecordingAndUpload();
+      setIsAlexSpeaking(false);
       setIsAlexThinking(true);
     } else {
       startRecording();
     }
   };
+
+  useEffect(() => {
+    if (audioRef.current && audioUrl) {
+      audioRef.current.onplay = () => {
+        setIsAlexSpeaking(true);
+      };
+      audioRef.current.onpause = () => {
+        setIsAlexSpeaking(false);
+      };
+      audioRef.current.onended = () => {
+        setIsAlexSpeaking(false);
+      };
+    }
+  }, [audioUrl]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
@@ -374,19 +399,22 @@ export default function InterviewMeet({
             </div>
 
             <div className="relative bg-slate-900/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-slate-800 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-4">
-                  <Bot className="w-10 h-10 text-indigo-500" />
-                </div>
-                <h3 className="text-2xl font-semibold text-white">
-                  AI Interviewer
-                </h3>
-                <p className="text-slate-400 mt-2">
-                  Technical Interview Session
-                </p>
+              <div className="text-center w-full h-full relative">
+                <Image
+                  src={Alex}
+                  alt="ai interviwe"
+                  layout="fill"
+                  objectFit="cover"
+                  priority
+                />
+                {isAlexSpeaking && (
+                  <p className="text-slate-600 mt-2 animate-pulse absolute top-4 left-5">
+                    Alex is speaking...
+                  </p>
+                )}
                 {isAlexThinking && (
-                  <p className="text-slate-400 mt-2 animate-pulse">
-                    Alex is thinking...
+                  <p className="text-slate-600 mt-2 animate-pulse absolute top-4 left-5">
+                    Alex is analyzing your response...
                   </p>
                 )}
               </div>

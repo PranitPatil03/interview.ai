@@ -139,35 +139,35 @@ export default function InterviewSetup({
     }
   };
 
-  const sampleJD = `Full-stack NextJS AI Engineer
-$20k – $30k • No equity
-About the job
-Responsibilities:
-- Develop and maintain fullstack applications using NodeJS, NextJS, ReactJS, ExpressJS, and MongoDB
-- Experience and understanding of Vercel's AI SDK
-- Integrate AI APIs into our applications, ensuring seamless functionality and user experience
-- Collaborate with the development team to design, develop, and deploy new features
-- Implement CRUD operations and ensure efficient data handling and storage
-- Utilize Vercel's AI SDK, OpenAI SDK, and Langchain.js for AI integration
-- Leverage CSS frameworks such as TailwindCSS, ShadcnUI to build great UI
-- Write clean, maintainable, and efficient code
-- Participate in code reviews and provide constructive feedback
-- Stay updated with the latest industry trends and technologies
-Requirements:
-- Proficient in JavaScript and modern JavaScript frameworks and libraries (Node.js, Next.js, React.js)
-- Experience with backend frameworks like Express.js and databases such as MongoDB
-- Familiarity with AI concepts such as transformers and diffusion models
-- Hands-on experience with Vercel AI SDK, OpenAI npm SDK, and Langchain.js
-- Understanding of CRUD applications and their implementation
-- Proficiency with CSS frameworks such as TailwindCSS, ShadcnUI
-- Ability to work collaboratively in a team environment
-- Strong problem-solving skills and attention to detail.
-- Excellent communication skills
-Preferred Qualifications:
-- Previous experience or projects showcasing AI integration - strong plus.
-- Familiarity with AI-driven applications and their development.
-- Knowledge of AI technologies and frameworks
-- Ability to learn quickly and adapt to new technologies`;
+  //   const sampleJD = `Full-stack NextJS AI Engineer
+  // $20k – $30k • No equity
+  // About the job
+  // Responsibilities:
+  // - Develop and maintain fullstack applications using NodeJS, NextJS, ReactJS, ExpressJS, and MongoDB
+  // - Experience and understanding of Vercel's AI SDK
+  // - Integrate AI APIs into our applications, ensuring seamless functionality and user experience
+  // - Collaborate with the development team to design, develop, and deploy new features
+  // - Implement CRUD operations and ensure efficient data handling and storage
+  // - Utilize Vercel's AI SDK, OpenAI SDK, and Langchain.js for AI integration
+  // - Leverage CSS frameworks such as TailwindCSS, ShadcnUI to build great UI
+  // - Write clean, maintainable, and efficient code
+  // - Participate in code reviews and provide constructive feedback
+  // - Stay updated with the latest industry trends and technologies
+  // Requirements:
+  // - Proficient in JavaScript and modern JavaScript frameworks and libraries (Node.js, Next.js, React.js)
+  // - Experience with backend frameworks like Express.js and databases such as MongoDB
+  // - Familiarity with AI concepts such as transformers and diffusion models
+  // - Hands-on experience with Vercel AI SDK, OpenAI npm SDK, and Langchain.js
+  // - Understanding of CRUD applications and their implementation
+  // - Proficiency with CSS frameworks such as TailwindCSS, ShadcnUI
+  // - Ability to work collaboratively in a team environment
+  // - Strong problem-solving skills and attention to detail.
+  // - Excellent communication skills
+  // Preferred Qualifications:
+  // - Previous experience or projects showcasing AI integration - strong plus.
+  // - Familiarity with AI-driven applications and their development.
+  // - Knowledge of AI technologies and frameworks
+  // - Ability to learn quickly and adapt to new technologies`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8">
@@ -201,7 +201,7 @@ Preferred Qualifications:
                   onChange={(e) => setJobDescription(e.target.value)}
                   required
                 />
-                <Button
+                {/* <Button
                   type="button"
                   variant="outline"
                   size="sm"
@@ -209,7 +209,7 @@ Preferred Qualifications:
                   className="mt-2 border-slate-100 hover:bg-slate-100"
                 >
                   Load Sample JD
-                </Button>
+                </Button> */}
               </div>
 
               <div className="space-y-2">

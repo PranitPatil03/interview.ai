@@ -27,7 +27,6 @@ import AudioVisualization from "./AudioVisualization";
 import { AudioRecorder } from "@/lib/audioRecorder";
 import Image, { StaticImageData } from "next/image";
 import Alex from "../../../../public/images/Alex.jpeg";
-import Samantha from "../../../../public/images/Samantha.jpeg";
 import Jessica from "../../../../public/images/Jessica.jpeg";
 import Emily from "../../../../public/images/Emily.jpeg";
 
@@ -47,10 +46,6 @@ const AIInterviwers: AIintervier[] = [
   {
     name: "Alex",
     imageName: Alex,
-  },
-  {
-    name: "Samantha",
-    imageName: Samantha,
   },
   {
     name: "Jessica",
@@ -361,7 +356,7 @@ export default function InterviewMeet({
           transcription,
           parsedInterviewData.interviewOutline
         );
-        return res
+        return res;
       }
     } catch (error) {
       console.error("Failed to stop recording:", error);
@@ -439,13 +434,7 @@ export default function InterviewMeet({
             <div className="relative bg-slate-900/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-slate-800 flex items-center justify-center">
               <div className="text-center w-full h-full relative">
                 <Image
-                  src={
-                    selectedInterviewer?.imageName ||
-                    Alex ||
-                    Samantha ||
-                    Emily ||
-                    Jessica
-                  }
+                  src={selectedInterviewer?.imageName || Alex}
                   alt="ai interviwe"
                   layout="fill"
                   objectFit="cover"

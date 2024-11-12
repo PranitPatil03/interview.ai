@@ -68,6 +68,7 @@ export default function InterviewMeet({
   const [timerStarted, setTimerStarted] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [isAlexThinking, setIsAlexThinking] = useState(false);
 
   useEffect(() => {
     const recorder = new AudioRecorder({
@@ -111,10 +112,13 @@ export default function InterviewMeet({
       const timer = setTimeout(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
-
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && audioRef.current && audioUrl) {
       audioRef.current.play();
+    }
+
+    if (audioRef.current && audioUrl) {
+      setIsAlexThinking(false);
     }
   }, [timerStarted, timeLeft, audioUrl]);
 
@@ -283,8 +287,8 @@ export default function InterviewMeet({
       }
 
       const data = await response.json();
-      console.log("ai-question",data);
-      setAudioUrl(data.audioUrl)
+      console.log("ai-question", data);
+      setAudioUrl(data.audioUrl);
       return data;
     } catch (error) {
       console.error("Failed to run interview", error);
@@ -341,6 +345,7 @@ export default function InterviewMeet({
   const toggleRecording = () => {
     if (isRecording) {
       stopRecordingAndUpload();
+      setIsAlexThinking(true);
     } else {
       startRecording();
     }
@@ -379,6 +384,11 @@ export default function InterviewMeet({
                 <p className="text-slate-400 mt-2">
                   Technical Interview Session
                 </p>
+                {isAlexThinking && (
+                  <p className="text-slate-400 mt-2 animate-pulse">
+                    Alex is thinking...
+                  </p>
+                )}
               </div>
               <div className="absolute bottom-4 left-4 flex items-center gap-3 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-slate-200 text-sm border border-slate-700">
                 <span>AI Interviewer</span>

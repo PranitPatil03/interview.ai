@@ -50,11 +50,7 @@ const getInterviewData = async () => {
     ],
   };
 };
-export default function InterviewSummary({
-  params,
-}: {
-  params: { interviewId: string };
-}) {
+export default function InterviewSummary() {
   const [interviewData, setInterviewData] = useState<{
     title: string;
     date: string;
@@ -65,8 +61,6 @@ export default function InterviewSummary({
     areasForImprovement: string[];
   } | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
-
-  console.log(params.interviewId);
 
   useEffect(() => {
     const fetchData = async () => {

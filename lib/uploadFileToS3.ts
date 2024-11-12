@@ -53,7 +53,6 @@ export const uploadInterviewToS3 = async (
     await s3Client.send(new PutObjectCommand(uploadParams));
 
     const fileUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${key}`;
-    console.log("Interview uploaded successfully:", fileUrl);
 
     return fileUrl;
   } catch (error) {
@@ -70,7 +69,6 @@ export const fetchInterviewFromS3 = async (interviewUrl: string) => {
   try {
     const response = await fetch(interviewUrl);
     const bodyContents = await response.text();
-    console.log("file", bodyContents);
 
     return bodyContents;
   } catch (error) {

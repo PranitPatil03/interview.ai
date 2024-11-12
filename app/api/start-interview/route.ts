@@ -29,8 +29,6 @@ export async function POST(req: NextRequest) {
 
     const { audioUrl, mimeType } = await generateAudio(text);
 
-    console.log(audioUrl);
-
     return NextResponse.json({
       success: true,
       audioUrl,

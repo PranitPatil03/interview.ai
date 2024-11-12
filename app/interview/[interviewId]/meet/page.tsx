@@ -135,7 +135,6 @@ export default function InterviewMeet({
         const startInterview = localStorage.getItem(
           `interview-intro-${params.interviewId}`
         );
-        console.log("data data data", startInterview);
         if (startInterview) {
           const parsedData = JSON.parse(startInterview);
           if (parsedData.success && parsedData.audioUrl) {
@@ -323,7 +322,6 @@ export default function InterviewMeet({
     transcription: string,
     parsedInterviewData: string
   ) => {
-    console.log("dasdasd123123", transcription);
     if (!transcription && !parsedInterviewData) return;
 
     try {
@@ -340,7 +338,6 @@ export default function InterviewMeet({
       }
 
       const data = await response.json();
-      console.log("ai-question", data);
       setAudioUrl(data.audioUrl);
       return data;
     } catch (error) {
@@ -353,9 +350,7 @@ export default function InterviewMeet({
     try {
       setIsRecording(false);
       const audioUrl = await audioRecorder.stopRecordingAndUpload();
-      console.log("Recording uploaded:", audioUrl);
       const transcription = await fetchTranscription(audioUrl);
-      console.log("Transcription:", transcription);
 
       const interviewData = localStorage.getItem(
         `interview-data-${params.interviewId}`
@@ -366,7 +361,7 @@ export default function InterviewMeet({
           transcription,
           parsedInterviewData.interviewOutline
         );
-        console.log(res);
+        return res
       }
     } catch (error) {
       console.error("Failed to stop recording:", error);

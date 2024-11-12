@@ -138,7 +138,6 @@ export class AudioRecorder {
 
       await this.s3Client.send(command);
       const fileUrl = `https://${this.bucketName}.s3.amazonaws.com/recordings/${fileName}`;
-      console.log("File uploaded successfully:", fileUrl);
       return fileUrl;
     } catch (error) {
       console.error("Error uploading to S3:", error);

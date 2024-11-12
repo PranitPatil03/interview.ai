@@ -88,9 +88,6 @@ export default function InterviewSetup({
         `interview-data-${params.interviewId}`,
         JSON.stringify(result)
       );
-      console.log("interview", result.interview);
-      console.log("interviewUrl", result.interviewUrl);
-      console.log("interviewOutline", result.interviewOutline);
 
       if (!result.interview) {
         throw new Error("Interview content is missing in the response.");
@@ -101,8 +98,6 @@ export default function InterviewSetup({
         `interview-intro-${params.interviewId}`,
         JSON.stringify(startInterview)
       );
-
-      console.log("Generated interview introduction:", startInterview);
 
       return result;
     } catch (error) {

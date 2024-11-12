@@ -17,8 +17,6 @@ export async function POST(req: NextRequest) {
   try {
     const { transcription, parsedInterviewData } = await req.json();
 
-    console.log("data-1212", parsedInterviewData);
-
     const prompt = `You are an expert interviewer conducting a structured interview strictly based on the provided outline. Each response should analyze the candidate’s answer and then pose logical follow-up or next questions aligned with the interview's flow. Avoid introducing unrelated questions and prioritize clarity and relevance to the job role. Maintain time control and stay within the allocated interview duration.
 
     **Interview Outline and Context:**
@@ -97,8 +95,6 @@ export async function POST(req: NextRequest) {
     }
 
     const questionResponse = await generateAudio(response.nextQuestion);
-    console.log("ai-next-question", questionResponse);
-    console.log("ai-resp", response);
 
     return NextResponse.json(questionResponse);
   } catch (error) {

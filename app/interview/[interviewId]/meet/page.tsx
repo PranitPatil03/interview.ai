@@ -25,8 +25,11 @@ import {
 } from "lucide-react";
 import AudioVisualization from "./AudioVisualization";
 import { AudioRecorder } from "@/lib/audioRecorder";
-import Image from "next/image";
-import Alex from "../../../../public/images/alex ai interviwer.jpeg";
+import Image, { StaticImageData } from "next/image";
+import Alex from "../../../../public/images/Alex.jpeg";
+import Samantha from "../../../../public/images/Samantha.jpeg";
+import Jessica from "../../../../public/images/Jessica.jpeg";
+import Emily from "../../../../public/images/Emily.jpeg";
 
 interface Message {
   id: number;
@@ -34,6 +37,30 @@ interface Message {
   content: string;
   timestamp: Date;
 }
+
+interface AIintervier {
+  name: string;
+  imageName: string | StaticImageData;
+}
+
+const AIInterviwers: AIintervier[] = [
+  {
+    name: "Alex",
+    imageName: Alex,
+  },
+  {
+    name: "Samantha",
+    imageName: Samantha,
+  },
+  {
+    name: "Jessica",
+    imageName: Jessica,
+  },
+  {
+    name: "Emily",
+    imageName: Emily,
+  },
+];
 
 export default function InterviewMeet({
   params,
@@ -52,6 +79,13 @@ export default function InterviewMeet({
       sender: "AI Interviewer",
       content:
         "Hello! Welcome to your interview. Let's begin with a brief introduction about yourself.",
+      timestamp: new Date(),
+    },
+    {
+      id: 2,
+      sender: "AI Interviewer",
+      content:
+        "Be sure to click the record button to answer each question. Don’t record while Alex is speaking—allow her time to finish before responding.",
       timestamp: new Date(),
     },
   ]);
@@ -83,6 +117,15 @@ export default function InterviewMeet({
       },
     });
     setAudioRecorder(recorder);
+  }, []);
+
+  const [selectedInterviewer, setSelectedInterviewer] =
+    useState<AIintervier | null>(null);
+
+  useEffect(() => {
+    const randomInterviewer =
+      AIInterviwers[Math.floor(Math.random() * AIInterviwers.length)];
+    setSelectedInterviewer(randomInterviewer);
   }, []);
 
   useEffect(() => {
@@ -401,7 +444,13 @@ export default function InterviewMeet({
             <div className="relative bg-slate-900/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-slate-800 flex items-center justify-center">
               <div className="text-center w-full h-full relative">
                 <Image
-                  src={Alex}
+                  src={
+                    selectedInterviewer?.imageName ||
+                    Alex ||
+                    Samantha ||
+                    Emily ||
+                    Jessica
+                  }
                   alt="ai interviwe"
                   layout="fill"
                   objectFit="cover"
@@ -409,17 +458,17 @@ export default function InterviewMeet({
                 />
                 {isAlexSpeaking && (
                   <p className="text-slate-600 mt-2 animate-pulse absolute top-4 left-5">
-                    Alex is speaking...
+                    {selectedInterviewer?.name} is speaking...
                   </p>
                 )}
                 {isAlexThinking && (
                   <p className="text-slate-600 mt-2 animate-pulse absolute top-4 left-5">
-                    Alex is analyzing your response...
+                    {selectedInterviewer?.name} is analyzing your response...
                   </p>
                 )}
               </div>
               <div className="absolute bottom-4 left-4 flex items-center gap-3 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-slate-200 text-sm border border-slate-700">
-                <span>AI Interviewer</span>
+                <span>{selectedInterviewer?.name}</span>
                 <AudioVisualization
                   isActive={false}
                   isSpeaking={isAISpeaking}
@@ -628,7 +677,7 @@ export default function InterviewMeet({
                     </div>
                     <div>
                       <p className="font-medium text-slate-200">
-                        AI Interviewer
+                        {selectedInterviewer?.name}
                       </p>
                       <p className="text-sm text-slate-400">
                         Technical Interviewer

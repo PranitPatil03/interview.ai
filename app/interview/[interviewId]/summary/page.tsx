@@ -26,7 +26,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const getInterviewData = async () => {
-  // Simulated API call
   return {
     title: "Web Development Interview",
     date: "Completed on May 15, 2023",
@@ -65,16 +64,39 @@ export default function InterviewSummary({
     strengths: string[];
     areasForImprovement: string[];
   } | null>(null);
+  const [isProcessing, setIsProcessing] = useState(true);
 
-  console.log(params.interviewId)
+  console.log(params.interviewId);
 
   useEffect(() => {
     const fetchData = async () => {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 5000 + Math.random() * 5000)
+      );
       const data = await getInterviewData();
       setInterviewData(data);
+      setIsProcessing(false);
     };
     fetchData();
   }, []);
+
+  if (isProcessing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center">
+        <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm shadow-xl p-8">
+          <CardContent className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+            <p className="text-xl text-white">
+              Your interview is processing...
+            </p>
+            <p className="text-sm text-slate-400 mt-2">
+              Please wait a few seconds for the summary to be created.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!interviewData) return <div>Loading...</div>;
 

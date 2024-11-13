@@ -27,8 +27,6 @@ import AudioVisualization from "./AudioVisualization";
 import { AudioRecorder } from "@/lib/audioRecorder";
 import Image, { StaticImageData } from "next/image";
 import Alex from "../../../../public/images/Alex.jpeg";
-import Jessica from "../../../../public/images/Jessica.jpeg";
-import Emily from "../../../../public/images/Emily.jpeg";
 
 interface Message {
   id: number;
@@ -46,15 +44,7 @@ const AIInterviwers: AIintervier[] = [
   {
     name: "Alex",
     imageName: Alex,
-  },
-  {
-    name: "Jessica",
-    imageName: Jessica,
-  },
-  {
-    name: "Emily",
-    imageName: Emily,
-  },
+  }
 ];
 
 export default function InterviewMeet({
